@@ -14,7 +14,7 @@
 ########################################################### 
 # Configrature the third library with follow selection
 ########################################################### 
-LIBINC_STANDARD = yes
+LIBINC_STANDARD = no
 LIBINC_SDL      = no
 LIBINC_SDL2     = no
 LIBINC_GUI      = yes
