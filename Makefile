@@ -11,7 +11,7 @@
 ###########################################################
 ###########################################################
 #     Project name
-#     Selection: EVA11
+#     Selection: engine
 export PROJ     :=
 export DEBUG    :=
 export CASM     :=

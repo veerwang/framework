@@ -68,7 +68,6 @@ ifeq ($(DEBUG),yes)
 else
 	@$(STRIP) $(EXEC)
 endif
-	@$(TOOLS_DIR)/md5app $(EXEC)
 	@cp $(EXEC) $(DEST_DIR)	
 
 ifneq ($(COMPILE),x86)
