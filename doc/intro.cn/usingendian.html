@@ -1,0 +1,103 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<meta http-equiv="Content-Language" content="zh-cn">
+<title>使用SDL：字节序无关</title>
+</head>
+
+<body bgcolor="#FFF8DC" text="#000000">
+<TABLE>
+<TR><!--#include file="../menu.tmpl" -->
+<TD>
+
+<p align="center">
+[<a href="usingtimers.html">前一页</a>]  
+<a href="toc.html"><font color="#8B0000">目录</font></a>
+</p>
+
+<h1><font color="#8B0000">使用SDL</font></h1> 
+
+<h2>字节序无关</h2>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td valign="top"><ul>
+            <li><strong>侦测当前系统的字节序 </strong></li>
+        </ul>
+        <blockquote>
+            <p>根据当前系统的字节序，C预处理定义SDL_BYTEORDER要么定义成SDL_LIL_ENDIAN，要么是SDL_BIG_ENDIAN。</p>
+            <p>小端字节序系统写磁盘时的数据安排：&nbsp;  
+            <br> &nbsp;&nbsp;&nbsp;&nbsp; [低字节] [高字节] <br>  
+            大端字节序系统写磁盘时的数据安排：&nbsp;  
+            <br> &nbsp;&nbsp;&nbsp;&nbsp; [高字节] [低字节] <br>  
+            </p>
+        </blockquote>
+        </td>
+        <td valign="top" width="200" bgcolor="#D3D3D3"><strong>提示：</strong><br>
+        x86系统是小端字节序系统； PPC系统是大端字节序系统。 </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="50">
+    <tr>
+        <td valign="top"><font color="#000080"><strong>例程：</strong></font>
+        <pre>
+<font color="#0000FF">#include</font> &quot;<font color="#000000">SDL_endian.h</font>&quot;
+
+<font color="#0000FF">#if</font> SDL_BYTEORDER == SDL_LIL_ENDIAN
+<font color="#0000FF">#define</font> SWAP16(X)    (X)
+<font color="#0000FF">#define</font> SWAP32(X)    (X)
+<font color="#0000FF">#else</font>
+<font color="#0000FF">#define</font> SWAP16(X)    SDL_Swap16(X)
+<font color="#0000FF">#define</font> SWAP32(X)    SDL_Swap32(X)
+<font color="#0000FF">#endif</font>
+</pre>
+        </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td valign="top"><ul>
+            <li><strong>根据系统的字节序转换数据</strong></li>
+        </ul>
+        <blockquote>
+            <p>SDL在SDL_endian.h中定义了一些高效的宏，SDL_Swap16()和 
+            SDL_Swap32()实现字节序的交换。另外也有从指定的字节序转换成本地系统字节序的宏。 </p>
+        </blockquote>
+        </td>
+        <td valign="top" width="200" bgcolor="#D3D3D3"><strong>提示：</strong><br>
+          尽管你需要了解系统字节序，但你并不需要所有的数据交换函数，包含 SDL_byteorder.h，而不是 
+          SDL_endian.h </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="50">
+    <tr>
+        <td valign="top"><font color="#000080"><strong>例程：</strong></font><pre>
+<font color="#0000FF">#include</font> &quot;<font color="#000000">SDL_endian.h</font>&quot;
+
+<font color="#008000">void</font> ReadScanline16(FILE *file, <font
+color="#008000">Uint16 *</font>scanline, <font color="#008000">int</font> length)
+{
+    fread(scanline, length, sizeof(Uint16), file);
+    <font color="#0000FF">if</font> ( SDL_BYTEORDER == SDL_BIG_ENDIAN ) {
+        <font color="#008000">int</font> i;
+        <font color="#0000FF">for</font> ( i=length-1; i &gt;= 0; --i )
+            scanline[i] = SDL_SwapLE16(scanline[i]);
+    }
+}
+</pre>
+        </td>
+    </tr>
+</table>
+
+<p align="center">
+[<a href="usingtimers.html">前一页</a>] 
+<a href="toc.html"><font color="#8B0000">目录</font></a>
+</p>
+
+</TABLE>
+</body>
+</html>

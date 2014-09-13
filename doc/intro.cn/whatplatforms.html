@@ -1,0 +1,70 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<meta http-equiv="Content-Language" content="zh-cn">
+<title>SDL: 可以运行在哪些平台上?</title>
+</head>
+
+<body bgcolor="#FFF8DC" text="#000000">
+<TABLE>
+<TR><!--#include file="../menu.tmpl" -->
+<TD>
+
+<p align="center">
+[<a href="whatcanitdo.html">前一页</a>] <a href="toc.html"><font color="#8B0000">目录</font> </a>  
+[<a href="usinginit.html">下一页</a>]
+</p>
+
+<h1><font color="#8B0000">SDL支持哪些系统平台？</font></h1>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td valign="top"><strong>Linux</strong><ul>
+            <li>视频显示使用X11，利用XFree86 DGA扩展的优势，全屏显示使用新的w MTRR加速。 </li> 
+            <li>声音使用OSS API。 </li> 
+            <li>使用clone()系统调用和SysV IPC，或者glibc-2.1的pthreads实现线程。 </li> 
+        </ul>
+        </td>
+        <td valign="top" width="200" bgcolor="#D3D3D3"><b>提示：</b>
+        <br>
+          你可以通过SDL_GetWMInfo()取得SDL驱动接口的隐藏部分，从而可以实现诸如去除窗口要素和图标化窗口等效果。 </td>
+    </tr>
+    <tr>
+        <td valign="top"><strong>Win32</strong><ul>
+            <li>有两个版本，一个是适合所有基于Win32的系统的安全版本，另一个是基于DirectX的高性能版本。 </li>
+            <li>安全版本的视频显示采用GDI。高性能版本采用DirectDraw，并支持硬件加速。 </li>
+            <li>安全版本的音频回放采用waveOut API。高性能版本采用DirectSound。 </li>
+        </ul>
+        </td>
+        <td valign="top" width="200" bgcolor="#D3D3D3"><b>提示：</b>
+        <br>
+          你必须在主线程中定期的读取Windows消息队列，以保持程序能够作出响应。 </td>
+    </tr>
+    <tr>
+        <td valign="top"><strong>BeOS</strong><ul>
+            <li>视频显示采用BWindow。 </li>
+            <li>音频回放采用BSoundPlayer API。 </li>
+        </ul>
+        </td>
+        <td valign="top" width="200" bgcolor="#D3D3D3"><b>提示：</b>
+        <br>
+        Linux和BeOS支持 SDL_INIT_EVENTTHREAD，调用SDL_Init()时使用该标记将使得事件循环在另一个线程中异步运行。这样即使程序忙，色彩光标也能响应。 </td>
+    </tr>
+    <tr>
+        <td valign="top"><strong>非正式的移植版本，进展中</strong><ul>
+            <li>Solaris, IRIX, FreeBSD </li>
+            <li>MacOS </li>
+        </ul>
+        </td>
+    </tr>
+</table>
+
+<p align="center">
+[<a href="whatcanitdo.html">前一页</a>] <a href="toc.html"><font color="#8B0000">目录</font> </a>  
+[<a href="usinginit.html">后一页</a>]
+</p>
+
+</TABLE>
+</body>
+</html>

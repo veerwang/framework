@@ -1,0 +1,171 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<meta http-equiv="Content-Language" content="zh-cn">
+<title>使用SDL: 音频</title>
+</head>
+
+<body bgcolor="#FFF8DC" text="#000000">
+<TABLE>
+<TR><!--#include file="../menu.tmpl" -->
+<TD>
+
+<p align="center">
+[<a href="usingevents.html">前一页</a>]   
+<a href="toc.html"><font color="#8B0000">目录</font> </a>
+[<a href="usingcdrom.html">后一页</a>]
+</p>
+
+<h1><font color="#8B0000">使用SDL</font></h1>
+
+<h2>音频</h2>
+
+<table border="0" cellpadding="4" width="907">
+    <tr>
+        <td valign="top" width="582"><ul>
+            <li><strong>打开音频设备</strong> </li>
+        </ul>
+        <blockquote>
+            <p>你需要一个回调函数来混合你的音频数据，并放入音频流。然后，选择你希望的音频格式，打开音频设备。 </p> 
+            <p>直到调用SDL_PauseAudio(0)，音频回放才真正开始；这样，在你的回调函数执行前，你可以根据需要执行其他的音频初始化工作。回放结束后，调用SDL_CloseAudio() 
+            关闭音频设备。 </p>
+        </blockquote>
+        </td>
+        <td valign="top" width="299" bgcolor="#D3D3D3"><b>提示：</b><br>
+          如果你的程序能够处理不同的音频格式，把一个SDL_AudioSpec的指针作为 pointer to 
+          SDL_OpenAudio() 
+          的第二个参数可以取得硬件真正的音频格式。如果第二个参数是NULL，音频数据将在运行时被转换成硬件格式。 </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="50">
+    <tr>
+        <td valign="top"><font color="#000080"><strong>例程：</strong></font><pre>
+<font color="#0000FF">#include</font> &quot;<font color="#000000">SDL.h</font>&quot;
+<font color="#0000FF">#include</font> &quot;<font color="#000000">SDL_audio.h</font>&quot;
+{
+    extern <font color="#008000">void</font> mixaudio(<font
+color="#008000">void *</font>unused, <font color="#008000">Uint8 *</font>stream, <font
+color="#008000">int</font> len);
+    SDL_AudioSpec fmt;
+
+    <font color="#FF0000">/* 设置16位，立体声，22Khz的音频 */</font>
+    fmt.freq = 22050;
+    fmt.format = AUDIO_S16;
+    fmt.channels = 2;
+    fmt.samples = 512;        <font color="#FF0000">/* 适合游戏的值 */</font>
+    fmt.callback = mixaudio;
+    fmt.userdata = NULL;
+
+    <font color="#FF0000">/* 打开音频设备，并开始回放！ */</font>
+    <font color="#0000FF">if</font> ( SDL_OpenAudio(&amp;fmt, NULL) &lt; 0 ) {
+        fprintf(stderr, &quot;<font color="#000000">无法打开音频： %s\n</font>&quot;, SDL_GetError());
+        exit(1);
+    }
+    SDL_PauseAudio(0);
+
+    ...
+
+    SDL_CloseAudio();
+}
+</pre>
+        </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="4" width="907">
+    <tr>
+        <td valign="top" width="635"><ul>
+            <li><strong>加载和回放声音</strong></li>
+        </ul>
+        <blockquote>
+            <p>为了你的编程方便，SDL提供了单独的声音加载和回放函数。加载声音后，需要调用SDL_ConvertAudio()将其转换成音频输出的格式，这样也可用于你的混音函数。 </p>
+        </blockquote>
+        </td>
+        <td valign="top" width="246" bgcolor="#D3D3D3"><b>提示：</b><br>
+        SDL的音频部分是位底层的软混音设计的。在SDL的演示包里有一个完整的遵循LGPL许可规范的混音器实现例子。. </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="50">
+    <tr>
+        <td valign="top"><font color="#000080"><strong>例程：</strong></font>
+        <pre>
+<font color="#0000FF">#define</font> NUM_SOUNDS 2
+<font color="#0000FF">struct</font> sample {
+    <font color="#008000">Uint8 *</font>data;
+    <font color="#008000">Uint32</font> dpos;
+    <font color="#008000">Uint32</font> dlen;
+} sounds[NUM_SOUNDS];
+
+<font color="#008000">void</font> mixaudio(<font color="#008000">void *</font>unused, <font
+color="#008000">Uint8 *</font>stream, <font color="#008000">int</font> len)
+{
+    <font color="#008000">int</font> i;
+    <font color="#008000">Uint32</font> amount;
+
+    <font color="#0000FF">for</font> ( i=0; i&lt;NUM_SOUNDS; ++i ) {
+        amount = (sounds[i].dlen-sounds[i].dpos);
+        <font color="#0000FF">if</font> ( amount &gt; len ) {
+            amount = len;
+        }
+        SDL_MixAudio(stream, &amp;sounds[i].data[sounds[i].dpos], amount, SDL_MIX_MAXVOLUME);
+        sounds[i].dpos += amount;
+    }
+}
+
+<font color="#008000">void</font> PlaySound(<font color="#008000">char *</font>file)
+{
+    <font color="#008000">int</font> index;
+    SDL_AudioSpec wave;
+    <font color="#008000">Uint8 *</font>data;
+    <font color="#008000">Uint32</font> dlen;
+    SDL_AudioCVT cvt;
+
+    <font color="#FF0000">/* 寻找一个空的（或者完成了的）音频口 */</font>
+    <font color="#0000FF">for</font> ( index=0; index&lt;NUM_SOUNDS; ++index ) {
+        <font color="#0000FF">if</font> ( sounds[index].dpos == sounds[index].dlen ) {
+            break;
+        }
+    }
+    <font color="#0000FF">if</font> ( index == NUM_SOUNDS )
+        return;
+
+    <font color="#FF0000">/* 加载声音文件，并转换成16位、立体声、22kHz格式 */</font>
+    <font color="#0000FF">if</font> ( SDL_LoadWAV(file, &amp;wave, &amp;data, &amp;dlen) == NULL ) {
+        fprintf(stderr, &quot;<font color="#000000">无法加载</font><font color="#000000"> %s: %s\n</font>&quot;, file, SDL_GetError());
+        return;
+    }
+    SDL_BuildAudioCVT(&amp;cvt, wave.format, wave.channels, wave.freq,
+                            AUDIO_S16,   2,             22050);
+    cvt.buf = malloc(dlen*cvt.len_mult);
+    memcpy(cvt.buf, data, dlen);
+    cvt.len = dlen;
+    SDL_ConvertAudio(&amp;cvt);
+    SDL_FreeWAV(data);
+
+    <font color="#FF0000">/* 将音频数据放入音频口（立刻开始回放了） */</font>
+    <font color="#0000FF">if</font> ( sounds[index].data ) {
+        free(sounds[index].data);
+    }
+    SDL_LockAudio();
+    sounds[index].data = cvt.buf;
+    sounds[index].dlen = cvt.len_cvt;
+    sounds[index].dpos = 0;
+    SDL_UnlockAudio();
+}
+</pre>
+        </td>
+    </tr>
+</table>
+
+<p align="center">
+[<a href="usingevents.html">前一页</a>] 
+<a href="toc.html"><font color="#8B0000">目录</font> </a>
+[<a href="usingcdrom.html">后一页</a>]
+</p>
+
+</TABLE>
+</body>
+</html>

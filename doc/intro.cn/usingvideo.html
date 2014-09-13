@@ -1,0 +1,192 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<meta http-equiv="Content-Language" content="zh-cn">
+<title>使用SDL：视频</title>
+</head>
+
+<body bgcolor="#FFF8DC" text="#000000">
+<TABLE>
+<TR><!--#include file="../menu.tmpl" -->
+<TD>
+
+<p align="center">
+[<a href="usinginit.html">前一页</a>] <a href="toc.html"><font color="#8B0000">目录</font> </a> 
+[<a href="usingevents.html">后一页</a>]
+</p>
+
+<h1><font color="#8B0000">使用SDL</font></h1>
+
+<h2>视频</h2>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td valign="top"><ul>
+            <li><font size="3"><strong>简便</strong></font><font size="3"><strong>的选择和设置视频模式</strong></font><blockquote>
+                    <p>只需选取中意的色彩深度和分辨率，然后设置即可！</p>
+                </blockquote>
+            </li>
+        </ul>
+        </td>
+        <td valign="top" width="300" bgcolor="#D3D3D3"><b>提示 #1:</b>
+        <br>
+          SDL_GetVideoInfo()可以获得硬件所支持的最快的色彩深度。<p><b>提示 
+        #2:</b> <br>
+          SDL_ListModes()可以获得某个色彩深度下所有支持的分辨率。 </p>
+        </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="50">
+    <tr>
+        <td valign="top"><font color="#000080"><strong>例程：</strong></font><strong>:</strong><pre>
+{ SDL_Surface *screen;
+
+    screen = SDL_SetVideoMode(640, 480, 16, SDL_SWSURFACE);
+    <font color="#0000FF">if</font> ( screen == NULL ) {
+        fprintf(stderr, &quot;无法设置<font color="#000000">640x480的视频模式：%s\n</font>&quot;, SDL_GetError());
+        exit(1);
+    }
+}
+</pre>
+        </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td valign="top"><ul>
+            <li><strong>在屏幕上绘制像素</strong> <blockquote>
+                    <p>通过直接写入图形帧缓冲（framebuffer）和调用屏幕更新函数来绘制屏幕。</p>
+                </blockquote>
+            </li>
+        </ul>
+        </td>
+        <td valign="top" width="300" bgcolor="#D3D3D3"><b>提示：</b><br>
+          如果你需要进行大量绘制，最好在绘制前锁住屏幕（如果有必要），绘制时保持一个需要更新的区域列表，并且在更新显示前对屏幕解锁。 </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="50">
+    <tr>
+        <td><font color="#000080"><strong>例程：</strong></font><p>在任意格式的屏幕上绘制像素</p>
+        <pre>
+<font color="#008000">void</font> DrawPixel(SDL_Surface *screen, <font
+color="#008000">Uint8</font> R, <font color="#008000">Uint8</font> G, <font
+color="#008000">Uint8</font> B)
+{
+    <font color="#008000">Uint32</font> color = SDL_MapRGB(screen-&gt;format, R, G, B);
+
+    <font color="#0000FF">if</font> ( SDL_MUSTLOCK(screen) ) {
+        <font color="#0000FF">if</font> ( SDL_LockSurface(screen) &lt; 0 ) {
+            return;
+        }
+    }
+    <font color="#0000FF">switch</font> (screen-&gt;format-&gt;BytesPerPixel) {
+        <font color="#0000FF">case</font> 1: { <font
+color="#FF0000">/* 假定是8-bpp */</font>
+            <font color="#008000">Uint8 *</font>bufp;
+
+            bufp = (<font color="#008000">Uint8 *</font>)screen-&gt;pixels + y*screen-&gt;pitch + x;
+            *bufp = color;
+        }
+        break;
+
+        <font color="#0000FF">case</font> 2: { <font
+color="#FF0000">/* 可能是15-bpp 或者 16-bpp */</font>
+            <font color="#008000">Uint16 *</font>bufp;
+
+            bufp = (<font color="#008000">Uint16 *</font>)screen-&gt;pixels + y*screen-&gt;pitch/2 + x;
+            *bufp = color;
+        }
+        break;
+
+        <font color="#0000FF">case</font> 3: { <font
+color="#FF0000">/* 慢速的24-bpp模式，通常不用 */</font>
+            <font color="#008000">Uint8 *</font>bufp;
+
+            bufp = (<font color="#008000">Uint8 *</font>)screen-&gt;pixels + y*screen-&gt;pitch + x;
+            *(bufp+screen-&gt;format-&gt;Rshift/8) = R;
+            *(bufp+screen-&gt;format-&gt;Gshift/8) = G;
+            *(bufp+screen-&gt;format-&gt;Bshift/8) = B;
+        }
+        break;
+
+        <font color="#0000FF">case</font> 4: { <font
+color="#FF0000">/* 可能是32-bpp */</font>
+            <font color="#008000">Uint32 *</font>bufp;
+
+            bufp = (<font color="#008000">Uint32 *</font>)screen-&gt;pixels + y*screen-&gt;pitch/4 + x;
+            *bufp = color;
+        }
+        break;
+    }
+    <font color="#0000FF">if</font> ( SDL_MUSTLOCK(screen) ) {
+        SDL_UnlockSurface(screen);
+    }
+    SDL_UpdateRect(screen, x, y, 1, 1);
+}
+</pre>
+        </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td valign="top"><ul>
+            <li><strong>加载和显示图片</strong> <blockquote>
+                    <p>SDL只提供了SDL_LoadBMP()，但在SDL的示例文档中有一个用于加载图片的函数库。 </p>
+                    <p>SDL_BlitSurface()将图片blit进图形帧缓冲，从而显示图片。SDL_BlitSurface()自动对blit矩形进行裁边，blit矩形在调用SDL_UpdateRects()时被用作更新屏幕变化了的部分。</p>
+                </blockquote>
+            </li>
+        </ul>
+        </td>
+        <td valign="top" width="300" bgcolor="#D3D3D3"><b>提示 #1：</b><br>
+          如果你需要多次显示某个图片，你可以调用 SDL_DisplayFormat()将图片转换成屏幕的格式，从而提高blit的速度。<p><b>提示 #2:</b><br> 
+          许多sprite的图片要求透明背景，你可以用SDL_SetColorKey()来设置透明色，从而实现透明效果的blit（也就是带colorkey的blit）。&nbsp; </p>
+        </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="50">
+    <tr>
+        <td><font color="#000080"><strong>例程：</strong></font><pre>
+<font color="#008000">void</font> ShowBMP(<font color="#008000">char *</font>file, SDL_Surface *screen, <font
+color="#008000">int</font> x, <font color="#008000">int</font> y)
+{
+    SDL_Surface *image;
+    SDL_Rect dest;
+
+    <font color="#FF0000">/* 将BMP文件加载到一个surface*/</font>
+    image = SDL_LoadBMP(file);
+    <font color="#0000FF">if</font> ( image == NULL ) {
+        fprintf(stderr, &quot;<font color="#000000">无法加载</font><font color="#000000"> %s: %s\n</font>&quot;, file, SDL_GetError());
+        return;
+    }
+
+    <font color="#FF0000">/* Blit到屏幕surface。onto the screen surface.
+       这时不能锁住surface。
+     */</font>
+    dest.x = x;
+    dest.y = y;
+    dest.w = image-&gt;w;
+    dest.h = image-&gt;h;
+    SDL_BlitSurface(image, NULL, screen, &amp;dest);
+
+    <font color="#FF0000">/* 刷新屏幕的变化部分 */</font>
+    SDL_UpdateRects(screen, 1, &amp;dest);
+}
+</pre>
+        </td>
+    </tr>
+</table>
+
+<p align="center">
+[<a href="usinginit.html">前一页</a>] <a href="toc.html"><font color="#8B0000">目录</font> </a> 
+[<a href="usingevents.html">后一页</a>]
+</p>
+
+</TABLE>
+</body>
+</html>

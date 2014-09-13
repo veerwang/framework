@@ -1,0 +1,102 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<meta http-equiv="Content-Language" content="zh-cn">
+<title>使用SDL: 定时器</title>
+</head>
+
+<body bgcolor="#FFF8DC" text="#000000">
+<TABLE>
+<TR><!--#include file="../menu.tmpl" -->
+<TD>
+
+<p align="center">
+[<a href="usingthreads.html">前一页</a>]     
+<a href="toc.html"><font color="#8B0000">目录</font> </a>
+[<a href="usingendian.html">后一页</a>]
+</p>
+
+<h1><font color="#8B0000">使用SDL</font></h1>
+
+<h2>定时器</h2>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td valign="top"><ul>
+            <li><strong>取得当前时间（毫秒级）</strong>
+            </li>
+        </ul>
+        <blockquote>
+            <p>调用SDL_GetTicks() 可以获得从过去某个时刻到现在所经过的毫秒。</p>      
+        </blockquote>
+        </td>
+        <td valign="top" width="300" bgcolor="#D3D3D3"><strong>提示：</strong><br>
+        总的来说，在游戏开发中基于时间，而不是帧率来移动对象要更好。这样在高速系统上和在低速系统上，游戏的节奏是一致的。</td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="50">
+    <tr>
+        <td valign="top"><font color="#000080"><strong>例程：</strong></font><strong>:
+        </strong><pre>
+<font color="#0000FF">#define</font> TICK_INTERVAL    30
+
+<font color="#008000">Uint32</font> TimeLeft(void)
+{
+    <font color="#0000FF">static</font> <font color="#008000">Uint32</font> next_time = 0;
+    <font color="#008000">Uint32</font> now;
+
+    now = SDL_GetTicks();
+    <font color="#0000FF">if</font> ( next_time &lt;= now ) {
+        next_time = now+TICK_INTERVAL;
+        <font color="#0000FF">return</font>(0);
+    }
+    <font color="#0000FF">return</font>(next_time-now);
+}
+</pre>
+        </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td valign="top"><ul>
+            <li><strong>等待一段时间（毫秒级） </strong></li>
+        </ul>
+        <blockquote>
+            <p>SDL_Delay() 可以实现毫秒级的等待。</p>    
+            <p>由于SDL支持的操作系统是多任务的，所以无法保证你的程序能够等待非常确切的一段时间。   
+            等待相关的函数更多的是用于程序空闲一段时间，而不是在一个很确切的时刻被唤醒。 </p> 
+        </blockquote>
+        </td>
+        <td valign="top" width="300" bgcolor="#D3D3D3"><strong>提示：</strong><br>
+        很多操作系统的调度时间片是10毫秒左右。调用SDL_Delay(1)将放弃当前的时间片。如果你的一个线程是很紧的循环，同时又要保持另一个线程（比如音频）运行，这就很有用。
+        </td> 
+    </tr>
+</table>
+
+<table border="0" cellpadding="50">
+    <tr>
+        <td valign="top"><font color="#000080"><strong>例程：</strong></font>
+        <pre>
+{
+    <font color="#0000FF">while</font> ( game_running ) {
+        UpdateGameState();
+        SDL_Delay(TimeLeft());
+    }
+}
+ </pre>
+        </td>
+    </tr>
+</table>
+
+<p align="center">
+[<a href="usingthreads.html">前一页</a>] 
+<a href="toc.html"><font color="#8B0000">目录</font> </a>
+[<a href="usingendian.html">后一页</a>]
+</p>
+
+</TABLE>
+</body>
+</html>
