@@ -44,7 +44,7 @@ all: $(DEPS) $(REALNAME)
 $(DEPS_DIR)%.cpp.dep: %.cpp | depsdir
 	@set -e; \
 	$(RM) -rf $@.tmp; \
-	gcc -E -MM $^ > $@.tmp; \
+	gcc $(CPP_COMPILE_FLAG) -E -MM $^ > $@.tmp; \
 	sed 's,\(.*\)\.o[ :]*,$(TXTOBJS)/\1.cpp.o:,g' < $@.tmp > $@; \
 	$(RM) $@.tmp
 

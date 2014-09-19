@@ -74,9 +74,9 @@ export CPP_COMPILE_FLAG \
 		    := -Werror -finline-functions
 
 ifeq 	($(COMPILE),arm9)
-	CPP_COMPILE_FLAG += -std=c++11
+	CPP_COMPILE_FLAG += -std=c++0x
 else ifeq ($(COMPILE),x86)
-	CPP_COMPILE_FLAG +=
+	CPP_COMPILE_FLAG += -std=c++0x
 endif
 
 export C_COMPILE_FLAG \
