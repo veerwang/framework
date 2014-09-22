@@ -12,5 +12,10 @@ lib_x86                 链接文件  存放的是工程使用第三方库
 log                     工程项目日志
 scripts                 各种编译脚本
 src                     各个工程代码树
+   common               各个工程公用代码
+   engine               主体工程
+      base              主目录
+      libgui            图形界面动态库
+      libresource       资源库
 Makefile                顶层Makefile文件
 README                  本说明文档 
