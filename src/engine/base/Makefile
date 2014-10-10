@@ -89,7 +89,7 @@ $(DEPS_DIR)%.cpp.dep: %.cpp | depsdir
 
 $(DEPS_DIR)%.c.dep: %.c | depsdir
 	@set -e; \
-	gcc $(CPP_COMPILE_FLAG) -E -MM $^ > $@.tmp; \
+	gcc $(C_COMPILE_FLAG) -E -MM $^ > $@.tmp; \
 	sed 's,\(.*\)\.o[ :]*,$(TXTOBJS)/\1.c.o:,g' < $@.tmp > $@; \
 	$(RM) $@.tmp
 
